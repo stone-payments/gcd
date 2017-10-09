@@ -33,7 +33,7 @@ test:	lint
 	@rm -rf *.out
 	@echo "mode: count" > coverage-all.out
 	@for pkg in $(PKGS); do \
-		go test -v -cover -coverprofile=coverage.out -covermode=count $$pkg -timeout 10ms && \
+		go test -v -cover -coverprofile=coverage.out -covermode=count $$pkg && \
 		tail -n +2 coverage.out >> ./coverage-all.out; \
 	done
 
@@ -43,5 +43,5 @@ lint: $(GOMETALINTER)
 
 $(GOMETALINTER):
 	@echo "---> Installing gometalinter"
-	go get -u -v github.com/alecthomas/gometalinter
-	gometalinter -i
+	@go get -u -v github.com/alecthomas/gometalinter
+	@gometalinter -i
