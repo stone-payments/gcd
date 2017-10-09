@@ -17,7 +17,8 @@ before_install:
   - cd $GOPATH/src/github.com/stone-payments/gcd
 
 install:
-  - go get github.com/mattn/goveralls
+  - go get -u -v github.com/mattn/goveralls
 
 script:
   - make
+  - $GOPATH/bin/goveralls -coverprofile=coverage-all.out -service travis-ci -repotoken $COVERALLS_TOKEN
