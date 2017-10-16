@@ -8,7 +8,7 @@ COPY . $WD
 
 WORKDIR $WD
 
-RUN make
+RUN CGO_ENABLED=0 go build -o ./bin/gcd ./
 
 FROM alpine
 
