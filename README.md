@@ -54,9 +54,6 @@ docker.io/alpine         latest              7328f6f8b418        6 weeks ago    
 > docker run --name gcd -v /var/run/docker.sock:/var/run/docker.sock guiferpa/gcd
 ```
 
-## Ansible
-Go to [role ansible repository](https://github.com/stone-payments/ansible-gcd) for more details
-
 ### Environment variables
 
 - __GCD_DOCKER_HOST:__ A env variable to set __-docker-host__, by default use `/var/run/docker.sock:/var/run/docker.sock`
