@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
 	docker "github.com/fsouza/go-dockerclient"
 )
 
@@ -65,7 +66,7 @@ func run(dc *docker.Client, opts options) {
 		All: true,
 	})
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
+		fmt.Fprint(os.Stderr, color.HiRedString(err.Error()))
 	}
 	var wgContainers sync.WaitGroup
 	for _, container := range containers {
@@ -84,7 +85,7 @@ func run(dc *docker.Client, opts options) {
 						RemoveVolumes: true,
 						Force:         true,
 					}); err != nil {
-						fmt.Fprintf(os.Stderr, "gcd: [error]: (when try remove container, reason: %v)\n", err.Error())
+						fmt.Fprintf(os.Stderr, "gcd: [error]: (when try remove container, reason: %v)\n", color.HiRedString(err.Error()))
 					} else {
 						fmt.Fprintf(os.Stdout, "gcd: [removed container]: (Id: %v, Labels: %v)\n", container.ID, container.Labels)
 					}
@@ -97,7 +98,7 @@ func run(dc *docker.Client, opts options) {
 		var wgImages sync.WaitGroup
 		images, err := dc.ListImages(docker.ListImagesOptions{})
 		if err != nil {
-			fmt.Fprint(os.Stderr, err)
+			fmt.Fprint(os.Stderr, color.HiRedString(err.Error()))
 		}
 		for _, image := range images {
 			wgImages.Add(1)
@@ -105,7 +106,7 @@ func run(dc *docker.Client, opts options) {
 				defer wgImages.Done()
 				fmt.Fprintf(os.Stdout, "gcd: [trying remove image]: (Id: %v, Tags: %v)\n", image.ID, image.RepoTags)
 				if err := dc.RemoveImage(image.ID); err != nil {
-					fmt.Fprintf(os.Stderr, "gcd: [error]: (when try remove image, reason: %v)\n", err.Error())
+					fmt.Fprintf(os.Stderr, "gcd: [error]: (when try remove image, reason: %v)\n", color.HiRedString(err.Error()))
 				} else {
 					fmt.Fprintf(os.Stdout, "gcd: [removed image]: (Id: %v, Tags: %v)\n", image.ID, image.RepoTags)
 				}
