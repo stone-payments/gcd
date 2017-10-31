@@ -5,61 +5,47 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/stone-payments/gcd)](https://goreportcard.com/report/github.com/stone-payments/gcd)
 
 ## Description
-This project is a garbage collector for docker images and container, it exists because today our machines contains a lot of garbage from Docker components.
+This project is a garbage collector for docker images and containers. It was created to alleviate the problem of old
+and unused containers laying around on Docker utilizing storage resources.
 
-## Binary
-
-### Building binary
-
+## Usage
+### Running locally built ELF
 ```bash
-> git clone https://github.com/stone-payments/gcd.git
-> make build
+./bin/gcd
 ```
 
-### Running builded binary
+### Running pre-built Docker image from Docker Hub
 ```bash
-> ./bin/gcd
+docker run --name gcd -v /var/run/docker.sock:/var/run/docker.sock guiferpa/gcd
 ```
-
-
 ### Parameters
+gcd can be parametrized via command-line arguments and, if you're using the Docker image, by environment variables.
 
-- __-docker-host__ Set docker host target
-- __-sweep-interval__ Set interval between sweep, this parameter only measures in second
-- __-remove-images__ Set enable to remove images that isn't any container dependencies
-- __-remove-healthy-containers-exited__ Set enable to remove containers exited with code 0
+#### CLI arguments
+- **-docker-host**: set docker host target (default: `/var/run/docker.sock`).
+- **-sweep-interval**: set interval in seconds between sweeps (default: `60`).
+- **-remove-images**: remove images that aren't container dependencies (default: `true`).
+- **-remove-healthy-containers-exited**: remove containers exited with code 0 (default: `true`).
 
-## Docker
+### Environment variables
+- **GCD_DOCKER_HOST**: set docker host target (default: `/var/run/docker.sock`).
+- **GCD_SWEEP_INTERVAL**: set interval in seconds between sweeps (default: `60`).
+- **GCD_REMOVE_IMAGES**: remove images that aren't container dependencies (default: `true`).
+- **GCD_REMOVE_HEALTHY_CONTAINERS_EXITED**: remove containers exited with code 0 (default: `true`).
 
-### Use docker image from Docker Hub
+## Building
+### Building ELF
 ```bash
-> docker run --name gcd -v /var/run/docker.sock:/var/run/docker.sock guiferpa/gcd
+git clone https://github.com/stone-payments/gcd.git
+make build
 ```
 
 ### Building docker image
+> :warning: This project uses multi-stage build to build the docker image with the included Dockerfile. Docker >=17.05
+> is required.
 ```bash
-> make build-image
+make build-image
 ```
-> :warning: This project use multi-stage build to build docker image, required use >=17.05 docker version
-
-### Running builded image
-```bash
-> docker images
-
-REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
-guiferpa/gcd             latest              04ba50851638        16 seconds ago      9.7 MB
-docker.io/golang         1.8-onbuild         5d82e356477f        2 weeks ago         699 MB
-docker.io/alpine         latest              7328f6f8b418        6 weeks ago         3.97 MB
-
-> docker run --name gcd -v /var/run/docker.sock:/var/run/docker.sock guiferpa/gcd
-```
-
-### Environment variables
-
-- __GCD_DOCKER_HOST:__ A env variable to set __-docker-host__, by default use `/var/run/docker.sock:/var/run/docker.sock`
-- __GCD_SWEEP_INTERVAL:__ A env variable to set __-sweep-interval__, by default use 60 seconds
-- __GCD_REMOVE_IMAGES__: A env variable to set __-remove-images__, by default use `true`
-- __GCD_REMOVE_HEALTHY_CONTAINERS_EXITED__: A env variable to set __-remove-healthy-containers-exited__, by default use `true`
 
 ### License
-[MIT](https://github.com/stone-payments/gcd/blob/master/LICENSE)
+This code is licensed under the MIT license.
