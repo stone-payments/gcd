@@ -19,6 +19,7 @@ import (
 type options struct {
 	dockerHost                    string
 	sweepInterval                 int
+	secondsBeforeAnImageCanBeSweeped int64
 	removeImages                  bool
 	removeHealthyContainersExited bool
 }
@@ -28,6 +29,7 @@ var opts options
 func init() {
 	flag.StringVar(&opts.dockerHost, "docker-host", "unix:///var/run/docker.sock", "-docker-host=unix:///var/run/docker.sock")
 	flag.IntVar(&opts.sweepInterval, "sweep-interval", 60, "-sweep-interval=60")
+	flag.Int64Var(&opts.secondsBeforeAnImageCanBeSweeped, "seconds-before-an-image-can-be-sweeped", 24*60*60, "--seconds-before-an-image-can-be-sweeped=3600")
 	flag.BoolVar(&opts.removeImages, "remove-images", true, "-remove-images=true")
 	flag.BoolVar(&opts.removeHealthyContainersExited, "remove-healthy-containers-exited", true, "-remove-healthy-containers-exited=true")
 }
@@ -47,6 +49,7 @@ func main() {
 	fmt.Fprintf(os.Stdout, "gcd: [info]: (Time: %v)\n", time.Now().String())
 	fmt.Fprintf(os.Stdout, "gcd: [info]: (Docker Host: %v)\n", opts.dockerHost)
 	fmt.Fprintf(os.Stdout, "gcd: [info]: (Sweep Interval: %vs)\n", opts.sweepInterval)
+	fmt.Fprintf(os.Stdout, "gcd: [info]: (Seconds Before An Image Can Be Sweeped: %vs)\n", opts.secondsBeforeAnImageCanBeSweeped)
 	fmt.Fprintf(os.Stdout, "gcd: [info]: (Remove Images: %v)\n", opts.removeImages)
 	fmt.Fprintf(os.Stdout, "gcd: [info]: (Remove Healthy Containers Exited: %v)\n", opts.removeHealthyContainersExited)
 
@@ -101,7 +104,8 @@ func run(dc *docker.Client, opts options) {
 			fmt.Fprint(os.Stderr, color.HiRedString(err.Error()))
 		}
 		for _, image := range images {
-			if time.Since(time.Unix(image.Created, 0)) > time.Second * 24*60*60 {
+			whenImageWasCreated := time.Unix(image.Created, 0)
+			if time.Since(whenImageWasCreated) > time.Duration(opts.secondsBeforeAnImageCanBeSweeped) * time.Second {
 				wgImages.Add(1)
 				go func(image docker.APIImages) {
 					defer wgImages.Done()
