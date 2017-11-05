@@ -101,16 +101,18 @@ func run(dc *docker.Client, opts options) {
 			fmt.Fprint(os.Stderr, color.HiRedString(err.Error()))
 		}
 		for _, image := range images {
-			wgImages.Add(1)
-			go func(image docker.APIImages) {
-				defer wgImages.Done()
-				fmt.Fprintf(os.Stdout, "gcd: [trying remove image]: (Id: %v, Tags: %v)\n", image.ID, image.RepoTags)
-				if err := dc.RemoveImage(image.ID); err != nil {
-					fmt.Fprintf(os.Stderr, "gcd: [error]: (when try remove image, reason: %v)\n", color.HiRedString(err.Error()))
-				} else {
-					fmt.Fprintf(os.Stdout, "gcd: [removed image]: (Id: %v, Tags: %v)\n", image.ID, image.RepoTags)
-				}
-			}(image)
+			if time.Since(time.Unix(image.Created, 0)) > time.Second * 24*60*60 {
+				wgImages.Add(1)
+				go func(image docker.APIImages) {
+					defer wgImages.Done()
+					fmt.Fprintf(os.Stdout, "gcd: [trying remove image]: (Id: %v, Tags: %v)\n", image.ID, image.RepoTags)
+					if err := dc.RemoveImage(image.ID); err != nil {
+						fmt.Fprintf(os.Stderr, "gcd: [error]: (when try remove image, reason: %v)\n", color.HiRedString(err.Error()))
+					} else {
+						fmt.Fprintf(os.Stdout, "gcd: [removed image]: (Id: %v, Tags: %v)\n", image.ID, image.RepoTags)
+					}
+				}(image)
+			}
 		}
 		wgImages.Wait()
 	}
