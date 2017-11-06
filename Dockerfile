@@ -20,8 +20,10 @@ ENV GCD_DOCKER_HOST "unix:///var/run/docker.sock"
 ENV GCD_SWEEP_INTERVAL "60"
 ENV GCD_REMOVE_IMAGES "true"
 ENV GCD_REMOVE_HEALTHY_CONTAINERS_EXITED "true"
+ENV GCD_SECONDS_BEFORE_AN_IMAGE_CAN_BE_SWEEPED "86400"
 
-CMD gcd -docker-host=$GCD_DOCKER_HOST \ 
+CMD gcd -docker-host=$GCD_DOCKER_HOST \
         -sweep-interval=$GCD_SWEEP_INTERVAL \
         -remove-images=$GCD_REMOVE_IMAGES \
-        -remove-healthy-containers-exited=$GCD_REMOVE_HEALTHY_CONTAINERS_EXITED
+        -remove-healthy-containers-exited=$GCD_REMOVE_HEALTHY_CONTAINERS_EXITED \
+        -seconds-before-an-image-can-be-sweeped=$GCD_SECONDS_BEFORE_AN_IMAGE_CAN_BE_SWEEPED
